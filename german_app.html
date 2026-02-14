@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historias en Inglés y Alemán</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0b1120;
+      color: #e5e7eb;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-top: 0.25rem;
+    }
+
+    main {
+      padding: 1.5rem 2rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .column {
+      background: #020617;
+      border-radius: 0.75rem;
+      border: 1px solid #1f2937;
+      padding: 1rem 1.2rem 1.2rem;
+    }
+
+    .column h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .column small {
+      color: #9ca3af;
+      font-size: 0.8rem;
+    }
+
+    .story {
+      margin-top: 0.9rem;
+      padding-top: 0.9rem;
+      border-top: 1px dashed #1f2937;
+    }
+
+    .story-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+      color: #e5e7eb;
+    }
+
+    .story-body {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #d1d5db;
+      white-space: pre-wrap;
+    }
+
+    .story-index {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-right: 0.25rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem 2rem 1.5rem;
+      font-size: 0.8rem;
+      color: #6b7280;
+      border-top: 1px solid #111827;
+      background: #020617;
+    }
+
+    @media (max-width: 640px) {
+      header, main, footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Generador de Historias EN/DE</h1>
+      <div class="subtitle">10 historias en inglés y 10 en alemán en un solo HTML</div>
+    </div>
+    <div class="pill">Versión base · Lista para pulir</div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="generateBtn">
+        🔁 Regenerar historias
+      </button>
+      <span class="pill" id="statusPill">
+        Listo · 10 EN + 10 DE
+      </span>
+    </section>
+
+    <section class="grid">
+      <div class="column">
+        <h2>Historias en inglés</h2>
+        <small>Generadas localmente con plantillas aleatorias</small>
+        <div id="englishStories"></div>
+      </div>
+
+      <div class="column">
+        <h2>Geschichten auf Deutsch</h2>
+        <small>Lokale, zufällige Vorlagen zum Üben</small>
+        <div id="germanStories"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Generador simple en HTML + JS · Pensado para practicar lectura y vocabulario
+  </footer>
+
+  <script>
+    // Plantillas simples para historias en inglés
+    const englishTemplates = [
+      (i) => `Every morning, I wake up early to walk through the quiet streets of my neighborhood. I like to watch the sky change colors as the sun rises. On story number ${i}, I decide to bring a notebook and write down three things I am grateful for.`,
+      (i) => `On a rainy afternoon, I sit by the window with a cup of tea and a good book. In story ${i}, the main character discovers an old letter hidden between the pages, changing the way they see their family history.`,
+      (i) => `During the summer, I often visit a small lake outside the city. In this ${i}th story, I rent a small boat and row to the center, where the water is calm and the world feels very far away.`,
+      (i) => `At the local library, I like to explore the travel section. Story ${i} follows a curious reader who chooses a random country and decides to learn ten new facts about it before the end of the day.`,
+      (i) => `On Saturday evenings, my friends and I cook dinner together. In story number ${i}, we try a new recipe from another culture and talk about the places we would like to visit one day.`,
+      (i) => `In a small café near my house, I always sit at the same table by the window. In this ${i}th story, a stranger asks to share the table, and a surprising conversation begins.`,
+      (i) => `On a cold winter night, the city is quiet and the streets are almost empty. Story ${i} describes a long walk through the snow, where the sound of footsteps becomes a kind of music.`,
+      (i) => `Every Friday, I write a short letter to my future self. In story ${i}, I decide to describe one fear I want to overcome and one dream I want to protect.`,
+      (i) => `In the park, there is an old tree with a wide trunk and strong branches. Story ${i} tells of a child who climbs the tree for the first time and sees the world from a new perspective.`,
+      (i) => `On a long train journey, I watch the landscape change from mountains to fields and then to the sea. In this ${i}th story, I imagine the lives of the people living in each small town we pass.`
+    ];
+
+    // Plantillas simples para historias en alemán
+    const germanTemplates = [
+      (i) => `Jeden Morgen wache ich früh auf und gehe durch die stillen Straßen meiner Nachbarschaft. In Geschichte Nummer ${i} nehme ich ein Notizbuch mit und schreibe drei Dinge auf, für die ich dankbar bin.`,
+      (i) => `An einem regnerischen Nachmittag sitze ich mit einer Tasse Tee und einem guten Buch am Fenster. In Geschichte ${i} findet die Hauptfigur einen alten Brief zwischen den Seiten, der ihre Sicht auf die Familiengeschichte verändert.`,
+      (i) => `Im Sommer besuche ich oft einen kleinen See außerhalb der Stadt. In dieser ${i}. Geschichte miete ich ein Ruderboot und fahre in die Mitte des Sees, wo das Wasser ruhig ist und die Welt weit weg erscheint.`,
+      (i) => `In der örtlichen Bibliothek stöbere ich gerne in der Reiseliteratur. Geschichte ${i} erzählt von einer neugierigen Leserin, die ein zufälliges Land auswählt und bis zum Abend zehn neue Fakten darüber lernen möchte.`,
+      (i) => `An Samstagabenden koche ich oft mit meinen Freunden zusammen. In Geschichte Nummer ${i} probieren wir ein neues Rezept aus einem anderen Land und sprechen über die Orte, die wir eines Tages besuchen möchten.`,
+      (i) => `In einem kleinen Café in der Nähe meiner Wohnung sitze ich immer am selben Tisch am Fenster. In dieser ${i}. Geschichte bittet ein Fremder darum, den Tisch zu teilen, und ein unerwartetes Gespräch beginnt.`,
+      (i) => `In einer kalten Winternacht ist die Stadt still und die Straßen sind fast leer. Geschichte ${i} beschreibt einen langen Spaziergang durch den Schnee, bei dem das Geräusch der Schritte wie Musik klingt.`,
+      (i) => `Jeden Freitag schreibe ich einen kurzen Brief an mein zukünftiges Ich. In Geschichte ${i} beschreibe ich eine Angst, die ich überwinden möchte, und einen Traum, den ich bewahren will.`,
+      (i) => `Im Park steht ein alter Baum mit einem dicken Stamm und starken Ästen. Geschichte ${i} erzählt von einem Kind, das zum ersten Mal auf den Baum klettert und die Welt aus einer neuen Perspektive sieht.`,
+      (i) => `Auf einer langen Zugreise beobachte ich, wie sich die Landschaft von Bergen zu Feldern und schließlich zum Meer verändert. In dieser ${i}. Geschichte stelle ich mir das Leben der Menschen in jedem kleinen Dorf vor, an dem wir vorbeifahren.`
+    ];
+
+    function getRandomTemplate(templates) {
+      const index = Math.floor(Math.random() * templates.length);
+      return templates[index];
+    }
+
+    function generateStories() {
+      const englishContainer = document.getElementById("englishStories");
+      const germanContainer = document.getElementById("germanStories");
+      const statusPill = document.getElementById("statusPill");
+
+      englishContainer.innerHTML = "";
+      germanContainer.innerHTML = "";
+
+      const totalStories = 10;
+
+      for (let i = 1; i <= totalStories; i++) {
+        // Inglés
+        const enTemplate = getRandomTemplate(englishTemplates);
+        const enStoryText = enTemplate(i);
+
+        const enStoryDiv = document.createElement("div");
+        enStoryDiv.className = "story";
+        enStoryDiv.innerHTML = `
+          <div class="story-title">
+            <span class="story-index">#${i}</span>
+            English story
+          </div>
+          <div class="story-body">${enStoryText}</div>
+        `;
+        englishContainer.appendChild(enStoryDiv);
+
+        // Alemán
+        const deTemplate = getRandomTemplate(germanTemplates);
+        const deStoryText = deTemplate(i);
+
+        const deStoryDiv = document.createElement("div");
+        deStoryDiv.className = "story";
+        deStoryDiv.innerHTML = `
+          <div class="story-title">
+            <span class="story-index">#${i}</span>
+            Deutsche Geschichte
+          </div>
+          <div class="story-body">${deStoryText}</div>
+        `;
+        germanContainer.appendChild(deStoryDiv);
+      }
+
+      const timestamp = new Date().toLocaleTimeString();
+      statusPill.textContent = `Generado · ${totalStories} EN + ${totalStories} DE · ${timestamp}`;
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generateStories);
+
+    // Generar al cargar
+    generateStories();
+  </script>
+</body>
+</html>

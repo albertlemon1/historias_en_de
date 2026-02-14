@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historias EN/DE con IA + Audio</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0b1120;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    main {
+      padding: 1.5rem 2rem;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: #111827;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1f2937;
+    }
+
+    select, input {
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .column {
+      background: #020617;
+      border: 1px solid #1f2937;
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+
+    .story {
+      border-top: 1px dashed #1f2937;
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .story-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .story-body {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .audio-btn {
+      background: #374151;
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Historias EN/DE con IA + Audio</h1>
+    <div class="subtitle">Generación con IA · Traducción opcional · Niveles A2/B1</div>
+  </header>
+
+  <main>
+    <div class="controls">
+      <div>
+        <label>API Key:</label><br>
+        <input id="apiKey" type="password" placeholder="Tu API key aquí">
+      </div>
+
+      <div>
+        <label>Modelo:</label><br>
+        <input id="modelName" value="gpt-4o-mini">
+      </div>
+
+      <div>
+        <label>Nivel:</label><br>
+        <select id="levelSelect">
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Modo:</label><br>
+        <select id="modeSelect">
+          <option value="same">Iguales (traducción)</option>
+          <option value="different">Diferentes</option>
+        </select>
+      </div>
+
+      <div>
+        <button id="generateBtn">🔁 Generar historias</button>
+      </div>
+
+      <div>
+        <button onclick="speechSynthesis.pause()">⏸️ Pausar</button>
+        <button onclick="speechSynthesis.resume()">▶️ Reanudar</button>
+        <button onclick="speechSynthesis.cancel()">⏹️ Detener</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="column">
+        <h2>Historias en inglés</h2>
+        <div id="englishStories"></div>
+      </div>
+
+      <div class="column">
+        <h2>Geschichten auf Deutsch</h2>
+        <div id="germanStories"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // -----------------------------
+    // AUDIO
+    // -----------------------------
+    let voices = [];
+    speechSynthesis.onvoiceschanged = () => {
+      voices = speechSynthesis.getVoices();
+    };
+
+    function speak(text, lang) {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang;
+      const v = voices.find(v => v.lang.startsWith(lang));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    }
+
+    // -----------------------------
+    // IA REQUEST
+    // -----------------------------
+    async function generateWithAI(prompt) {
+      const apiKey = document.getElementById("apiKey").value;
+      const model = document.getElementById("modelName").value;
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + apiKey
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7
+        })
+      });
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+
+    // -----------------------------
+    // GENERAR HISTORIAS
+    // -----------------------------
+    document.getElementById("generateBtn").addEventListener("click", async () => {
+      const level = document.getElementById("levelSelect").value;
+      const mode = document.getElementById("modeSelect").value;
+
+      const enContainer = document.getElementById("englishStories");
+      const deContainer = document.getElementById("germanStories");
+
+      enContainer.innerHTML = "Generando...";
+      deContainer.innerHTML = "Generando...";
+
+      const total = 10;
+
+      enContainer.innerHTML = "";
+      deContainer.innerHTML = "";
+
+      for (let i = 1; i <= total; i++) {
+        if (mode === "same") {
+          // MODO TRADUCCIÓN
+          const prompt = `
+Generate a story in English at level ${level}. 
+Length: 120–180 words.
+Theme: everyday life, simple narrative.
+After the English story, provide a German translation at level ${level === "A2" ? "A2" : "B1.1"}.
+Format:
+EN:
+[story]
+DE:
+[translation]
+          `;
+
+          const result = await generateWithAI(prompt);
+
+          const [_, enText, __, deText] = result.split(/EN:|DE:/);
+
+          addStory(enContainer, i, "English story", enText.trim(), "en-US");
+          addStory(deContainer, i, "Deutsche Geschichte", deText.trim(), "de-DE");
+
+        } else {
+          // MODO DIFERENTES
+          const promptEN = `
+Generate a story in English at level ${level}.
+Length: 120–180 words.
+Theme: everyday life, simple narrative.
+          `;
+
+          const promptDE = `
+Generate a story in German at level ${level === "A2" ? "A2" : "B1.1"}.
+Length: 120–180 words.
+Theme: Alltag, einfache Erzählung.
+          `;
+
+          const enText = await generateWithAI(promptEN);
+          const deText = await generateWithAI(promptDE);
+
+          addStory(enContainer, i, "English story", enText.trim(), "en-US");
+          addStory(deContainer, i, "Deutsche Geschichte", deText.trim(), "de-DE");
+        }
+      }
+    });
+
+    // -----------------------------
+    // UTILIDAD PARA AGREGAR HISTORIAS
+    // -----------------------------
+    function addStory(container, index, title, text, lang) {
+      const div = document.createElement("div");
+      div.className = "story";
+
+      div.innerHTML = `
+        <div class="story-title">#${index} — ${title}</div>
+        <div class="story-body">${text}</div>
+        <button class="audio-btn">🔊 Escuchar</button>
+      `;
+
+      div.querySelector("button").addEventListener("click", () => speak(text, lang));
+
+      container.appendChild(div);
+    }
+  </script>
+</body>
+</html>

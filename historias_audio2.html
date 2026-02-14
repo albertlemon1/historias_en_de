@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historias EN/DE con Audio y Niveles</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-top: 0.25rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      background: #020617;
+    }
+
+    main {
+      padding: 1.5rem 2rem 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+    }
+
+    .controls-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    select {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px -6px rgba(37, 99, 235, 0.6);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .button-secondary {
+      background: #111827;
+      border: 1px solid #374151;
+      color: #e5e7eb;
+      box-shadow: none;
+    }
+
+    .button-secondary:hover {
+      background: #1f2937;
+      box-shadow: 0 4px 10px -6px rgba(15, 23, 42, 0.8);
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      background: #020617;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .column {
+      background: #020617;
+      border-radius: 0.9rem;
+      border: 1px solid #1f2937;
+      padding: 1rem 1.2rem 1.2rem;
+      box-shadow: 0 18px 40px -24px rgba(15, 23, 42, 0.9);
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .column h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .column small {
+      color: #9ca3af;
+      font-size: 0.8rem;
+    }
+
+    .story {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #1f2937;
+    }
+
+    .story-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .story-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .story-index {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-right: 0.25rem;
+    }
+
+    .level-tag {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: #9ca3af;
+    }
+
+    .story-body {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #d1d5db;
+      white-space: pre-wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .story-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-button {
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem 2rem 1.5rem;
+      font-size: 0.8rem;
+      color: #6b7280;
+      border-top: 1px solid #111827;
+      background: #020617;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      header, main, footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .controls {
+        padding: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Historias EN/DE con Audio y Niveles</h1>
+      <div class="subtitle">
+        Lectura + escucha · Niveles A2 / B1 (EN) y A2 / B1.1 (DE)
+      </div>
+    </div>
+    <div class="badge">
+      <span>🎧 Modo práctica de idiomas</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="controls-group">
+        <button id="generateBtn">🔁 Generar historias</button>
+      </div>
+
+      <div class="controls-group">
+        <label for="modeSelect">Modo de historias:</label>
+        <select id="modeSelect">
+          <option value="same">Iguales (traducción EN ⇄ DE)</option>
+          <option value="different">Diferentes (EN y DE independientes)</option>
+        </select>
+      </div>
+
+      <div class="controls-group">
+        <label for="levelSelect">Nivel:</label>
+        <select id="levelSelect">
+          <option value="A2">A2 (Inglés A2 / Alemán A2)</option>
+          <option value="B1">B1 (Inglés B1 / Alemán B1.1)</option>
+        </select>
+      </div>
+
+      <div class="controls-group">
+        <button class="button-secondary" id="pauseBtn">⏸️ Pausar</button>
+        <button class="button-secondary" id="resumeBtn">▶️ Reanudar</button>
+        <button class="button-secondary" id="stopBtn">⏹️ Detener</button>
+      </div>
+
+      <div class="controls-group">
+        <span class="status-pill" id="statusPill">
+          Listo · 10 historias EN + 10 DE
+        </span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="column">
+        <div class="column-header">
+          <h2>Historias en inglés</h2>
+          <small id="enLevelLabel">Nivel: A2</small>
+        </div>
+        <div id="englishStories"></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">
+          <h2>Geschichten auf Deutsch</h2>
+          <small id="deLevelLabel">Niveau: A2</small>
+        </div>
+        <div id="germanStories"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    HTML + JavaScript · Web Speech API · Diseñado para practicar lectura y escucha en inglés y alemán
+  </footer>
+
+  <script>
+    // -----------------------------
+    // AUDIO
+    // -----------------------------
+    let availableVoices = [];
+
+    function loadVoices() {
+      availableVoices = speechSynthesis.getVoices();
+    }
+
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speakText(text, lang) {
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+
+      const voice = availableVoices.find(v => v.lang.startsWith(lang));
+      if (voice) {
+        utter.voice = voice;
+      }
+
+      speechSynthesis.speak(utter);
+    }
+
+    // -----------------------------
+    // PLANTILLAS BILINGÜES (MODO "IGUALES")
+    // Nivel aproximado A2 / B1
+    // -----------------------------
+    const bilingualStories = {
+      A2: [
+        {
+          en: "Every Saturday morning, I go to the local market near my home. I like to walk slowly through the stands and look at the fresh fruit and vegetables. I often talk to the sellers and ask where their products come from. Sometimes they tell me small stories about their farms or families. When I finish my shopping, I feel happy because I support local people and eat healthy food.",
+          de: "Jeden Samstagmorgen gehe ich auf den Markt in der Nähe meiner Wohnung. Ich gehe langsam an den Ständen vorbei und schaue mir das frische Obst und Gemüse an. Oft spreche ich mit den Verkäuferinnen und Verkäufern und frage, woher ihre Produkte kommen. Manchmal erzählen sie mir kleine Geschichten über ihre Höfe oder ihre Familien. Wenn ich mit meinen Einkäufen fertig bin, bin ich zufrieden, weil ich die Menschen vor Ort unterstütze und gesund esse."
+        },
+        {
+          en: "On weekday mornings, I usually take the bus to work. The bus is sometimes full, but I like to watch the people around me. Some read books, others listen to music, and a few just look out of the window. I often use the time to review my plans for the day. When I arrive at the office, I already feel prepared and more relaxed.",
+          de: "An Wochentagen fahre ich meistens mit dem Bus zur Arbeit. Der Bus ist manchmal voll, aber ich beobachte gerne die Menschen um mich herum. Einige lesen Bücher, andere hören Musik, und ein paar schauen einfach aus dem Fenster. Ich nutze die Zeit oft, um meine Pläne für den Tag durchzugehen. Wenn ich im Büro ankomme, fühle ich mich schon vorbereitet und entspannter."
+        },
+        {
+          en: "In the evening, I like to go for a short walk in my neighborhood. The streets are quieter, and the lights in the windows make the houses look warm and friendly. I sometimes meet neighbors who are walking their dogs or talking on the phone. We say hello and smile at each other. After the walk, I sleep better because my mind is calm and my body is a little tired.",
+          de: "Am Abend mache ich gerne einen kurzen Spaziergang in meiner Nachbarschaft. Die Straßen sind ruhiger, und die Lichter in den Fenstern lassen die Häuser warm und freundlich aussehen. Manchmal treffe ich Nachbarinnen und Nachbarn, die mit ihren Hunden spazieren gehen oder telefonieren. Wir grüßen uns und lächeln einander zu. Nach dem Spaziergang schlafe ich besser, weil mein Kopf ruhig ist und mein Körper ein wenig müde."
+        },
+        {
+          en: "On Sunday afternoons, I often visit my parents. We drink coffee together and talk about our week. My mother likes to tell me about her garden and the new flowers she wants to plant. My father usually shows me a book he is reading or a film he has watched. Before I go home, we plan the next visit so that we always have something to look forward to.",
+          de: "Am Sonntagnachmittag besuche ich oft meine Eltern. Wir trinken zusammen Kaffee und sprechen über unsere Woche. Meine Mutter erzählt mir gerne von ihrem Garten und von den neuen Blumen, die sie pflanzen möchte. Mein Vater zeigt mir meistens ein Buch, das er gerade liest, oder einen Film, den er gesehen hat. Bevor ich nach Hause gehe, planen wir den nächsten Besuch, damit wir immer etwas haben, worauf wir uns freuen können."
+        }
+      ],
+      B1: [
+        {
+          en: "Last year, I decided to change some of my daily habits to live a healthier life. At first, it was difficult to wake up earlier and go for a run before work, but after a few weeks it became a normal part of my routine. I also started cooking more at home instead of ordering fast food. Now I feel that I have more energy during the day, and I am proud that I was able to keep these changes for so long.",
+          de: "Letztes Jahr habe ich beschlossen, einige meiner täglichen Gewohnheiten zu ändern, um gesünder zu leben. Am Anfang war es schwierig, früher aufzustehen und vor der Arbeit joggen zu gehen, aber nach ein paar Wochen wurde es ein normaler Teil meines Alltags. Ich habe auch angefangen, mehr zu Hause zu kochen, statt Fast Food zu bestellen. Jetzt habe ich das Gefühl, dass ich tagsüber mehr Energie habe, und ich bin stolz darauf, dass ich diese Veränderungen so lange beibehalten konnte."
+        },
+        {
+          en: "When I started my new job, I was both excited and nervous. I wanted to make a good impression, but I was afraid of making mistakes. During the first week, I asked many questions and wrote everything down in a small notebook. My colleagues were patient and helped me understand the processes step by step. After a month, I felt much more confident and realized that it is normal to need time to learn something new.",
+          de: "Als ich meine neue Stelle begonnen habe, war ich gleichzeitig aufgeregt und nervös. Ich wollte einen guten Eindruck machen, hatte aber Angst, Fehler zu machen. In der ersten Woche stellte ich viele Fragen und schrieb alles in ein kleines Notizbuch. Meine Kolleginnen und Kollegen waren geduldig und halfen mir, die Abläufe Schritt für Schritt zu verstehen. Nach einem Monat fühlte ich mich viel sicherer und merkte, dass es normal ist, Zeit zu brauchen, um etwas Neues zu lernen."
+        },
+        {
+          en: "A few months ago, I joined a language exchange group in my city. Once a week, we meet in a small café and practice speaking different languages together. At the beginning, I was shy and spoke very slowly, but the others encouraged me and waited patiently when I searched for words. Now I can express my ideas more clearly, and I have also made new friends who share my interest in languages and travel.",
+          de: "Vor ein paar Monaten bin ich einer Sprachaustauschgruppe in meiner Stadt beigetreten. Einmal pro Woche treffen wir uns in einem kleinen Café und üben gemeinsam verschiedene Sprachen. Am Anfang war ich schüchtern und sprach sehr langsam, aber die anderen ermutigten mich und warteten geduldig, wenn ich nach Worten suchte. Jetzt kann ich meine Ideen klarer ausdrücken, und ich habe auch neue Freundinnen und Freunde gefunden, die mein Interesse an Sprachen und Reisen teilen."
+        },
+        {
+          en: "When I moved to a new apartment, I decided to decorate it in a way that really reflected my personality. I chose simple furniture but added many small details, like photos from my travels, plants in different corners, and a comfortable reading chair near the window. It took some time to organize everything, but now the place feels like a real home. When friends visit me, they often say that the atmosphere is warm and peaceful, which makes me very happy.",
+          de: "Als ich in eine neue Wohnung gezogen bin, habe ich beschlossen, sie so einzurichten, dass sie wirklich zu meiner Persönlichkeit passt. Ich habe einfache Möbel gewählt, aber viele kleine Details hinzugefügt, zum Beispiel Fotos von meinen Reisen, Pflanzen in verschiedenen Ecken und einen bequemen Lesesessel am Fenster. Es hat eine Weile gedauert, alles zu organisieren, aber jetzt fühlt sich der Ort wie ein richtiges Zuhause an. Wenn mich Freunde besuchen, sagen sie oft, dass die Atmosphäre warm und ruhig ist, und das freut mich sehr."
+        }
+      ]
+    };
+
+    // -----------------------------
+    // PLANTILLAS MONOLINGÜES (MODO "DIFERENTES")
+    // -----------------------------
+    const englishTemplatesByLevel = {
+      A2: [
+        (i) => "In the morning, I usually drink a glass of water and make a simple breakfast. In story " + i + ", I prepare toast with cheese and a small salad. While I eat, I listen to quiet music and check the weather for the day. This small routine helps me start my day in a calm and organized way.",
+        (i) => "Story " + i + " takes place in a small park near my house. I go there after work to relax and breathe fresh air. I often sit on the same bench and watch children playing or people walking their dogs. Even a short visit to the park makes me feel more relaxed.",
+        (i) => "In this story, number " + i + ", I visit a friend who lives in another part of the city. We drink tea, talk about our week, and sometimes play a board game. The time passes quickly because we always have something to laugh about. When I go home, I feel grateful for our friendship."
+      ],
+      B1: [
+        (i) => "Story " + i + " is about a small change that has a big effect. I decided to use my phone less in the evening and read a book instead. At first, it was difficult to break the old habit, but after some days I noticed that I slept better and felt more rested in the morning. This experience showed me that even small decisions can improve my daily life.",
+        (i) => "In this " + i + "th story, I join a cooking course at a community center. The group is mixed: some people are complete beginners, while others already have experience. We learn how to prepare simple but healthy meals, and we share our results at the end of each class. I enjoy the atmosphere because everyone is friendly and curious.",
+        (i) => "Story " + i + " describes a day when everything goes differently than planned. I miss my bus, forget an important document at home, and arrive late to a meeting. At first, I feel stressed and frustrated, but later I realize that mistakes happen to everyone. I decide to be kinder to myself and to prepare better for the next day."
+      ]
+    };
+
+    const germanTemplatesByLevel = {
+      A2: [
+        (i) => "Am Morgen trinke ich meistens ein Glas Wasser und mache ein einfaches Frühstück. In Geschichte " + i + " bereite ich Toast mit Käse und einen kleinen Salat zu. Während ich esse, höre ich leise Musik und schaue nach, wie das Wetter wird. Diese kleine Routine hilft mir, den Tag ruhig und organisiert zu beginnen.",
+        (i) => "Geschichte " + i + " spielt in einem kleinen Park in der Nähe meiner Wohnung. Nach der Arbeit gehe ich dorthin, um mich zu entspannen und frische Luft zu atmen. Ich sitze oft auf derselben Bank und beobachte Kinder beim Spielen oder Menschen mit ihren Hunden. Schon ein kurzer Besuch im Park macht mich ruhiger.",
+        (i) => "In dieser Geschichte, Nummer " + i + ", besuche ich eine Freundin, die in einem anderen Stadtteil wohnt. Wir trinken Tee, sprechen über unsere Woche und spielen manchmal ein Brettspiel. Die Zeit vergeht schnell, weil wir immer etwas zu lachen haben. Wenn ich nach Hause gehe, bin ich dankbar für unsere Freundschaft."
+      ],
+      B1: [
+        (i) => "Geschichte " + i + " erzählt von einer kleinen Veränderung mit großer Wirkung. Ich habe beschlossen, abends weniger auf mein Handy zu schauen und stattdessen ein Buch zu lesen. Am Anfang war es schwer, die alte Gewohnheit zu durchbrechen, aber nach einigen Tagen merkte ich, dass ich besser schlief und morgens ausgeruhter war. Diese Erfahrung hat mir gezeigt, dass auch kleine Entscheidungen meinen Alltag verbessern können.",
+        (i) => "In dieser " + i + ". Geschichte besuche ich einen Kochkurs im Gemeindezentrum. Die Gruppe ist gemischt: Einige sind totale Anfänger, andere haben schon Erfahrung. Wir lernen, einfache, aber gesunde Gerichte zuzubereiten und probieren am Ende jeder Stunde alles gemeinsam. Mir gefällt die Atmosphäre, weil alle freundlich und neugierig sind.",
+        (i) => "Geschichte " + i + " beschreibt einen Tag, an dem alles anders läuft als geplant. Ich verpasse den Bus, vergesse ein wichtiges Dokument zu Hause und komme zu spät zu einer Besprechung. Zuerst bin ich gestresst und frustriert, aber später merke ich, dass Fehler jedem passieren. Ich beschließe, freundlicher zu mir selbst zu sein und mich für den nächsten Tag besser vorzubereiten."
+      ]
+    };
+
+    // -----------------------------
+    // UTILIDADES
+    // -----------------------------
+    function getRandomItem(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function updateLevelLabels(level) {
+      const enLabel = document.getElementById("enLevelLabel");
+      const deLabel = document.getElementById("deLevelLabel");
+      if (level === "A2") {
+        enLabel.textContent = "Nivel: A2";
+        deLabel.textContent = "Niveau: A2";
+      } else {
+        enLabel.textContent = "Nivel: B1";
+        deLabel.textContent = "Niveau: B1.1";
+      }
+    }
+
+    // -----------------------------
+    // GENERACIÓN DE HISTORIAS
+    // -----------------------------
+    function generateStories() {
+      const mode = document.getElementById("modeSelect").value; // "same" o "different"
+      const level = document.getElementById("levelSelect").value; // "A2" o "B1"
+      const enContainer = document.getElementById("englishStories");
+      const deContainer = document.getElementById("germanStories");
+      const status = document.getElementById("statusPill");
+
+      enContainer.innerHTML = "";
+      deContainer.innerHTML = "";
+
+      updateLevelLabels(level);
+
+      const totalStories = 10;
+
+      if (mode === "same") {
+        // Modo traducción: historias emparejadas EN/DE
+        const pool = bilingualStories[level];
+        for (let i = 1; i <= totalStories; i++) {
+          const pair = getRandomItem(pool);
+          const enText = pair.en;
+          const deText = pair.de;
+
+          // Inglés
+          const enStoryDiv = document.createElement("div");
+          enStoryDiv.className = "story";
+
+          const enHeader = document.createElement("div");
+          enHeader.className = "story-header";
+
+          const enTitle = document.createElement("div");
+          enTitle.className = "story-title";
+          enTitle.innerHTML = '<span class="story-index">#' + i + '</span> English story';
+
+          const enLevelTag = document.createElement("span");
+          enLevelTag.className = "level-tag";
+          enLevelTag.textContent = level;
+
+          enHeader.appendChild(enTitle);
+          enHeader.appendChild(enLevelTag);
+
+          const enBody = document.createElement("div");
+          enBody.className = "story-body";
+          enBody.textContent = enText;
+
+          const enActions = document.createElement("div");
+          enActions.className = "story-actions";
+
+          const enAudioBtn = document.createElement("button");
+          enAudioBtn.className = "audio-button";
+          enAudioBtn.textContent = "🔊 Listen";
+          enAudioBtn.addEventListener("click", () => speakText(enText, "en-US"));
+
+          enActions.appendChild(enAudioBtn);
+
+          enStoryDiv.appendChild(enHeader);
+          enStoryDiv.appendChild(enBody);
+          enStoryDiv.appendChild(enActions);
+
+          enContainer.appendChild(enStoryDiv);
+
+          // Alemán
+          const deStoryDiv = document.createElement("div");
+          deStoryDiv.className = "story";
+
+          const deHeader = document.createElement("div");
+          deHeader.className = "story-header";
+
+          const deTitle = document.createElement("div");
+          deTitle.className = "story-title";
+          deTitle.innerHTML = '<span class="story-index">#' + i + '</span> Deutsche Geschichte';
+
+          const deLevelTag = document.createElement("span");
+          deLevelTag.className = "level-tag";
+          deLevelTag.textContent = level === "A2" ? "A2" : "B1.1";
+
+          deHeader.appendChild(deTitle);
+          deHeader.appendChild(deLevelTag);
+
+          const deBody = document.createElement("div");
+          deBody.className = "story-body";
+          deBody.textContent = deText;
+
+          const deActions = document.createElement("div");
+          deActions.className = "story-actions";
+
+          const deAudioBtn = document.createElement("button");
+          deAudioBtn.className = "audio-button";
+          deAudioBtn.textContent = "🔊 Anhören";
+          deAudioBtn.addEventListener("click", () => speakText(deText, "de-DE"));
+
+          deActions.appendChild(deAudioBtn);
+
+          deStoryDiv.appendChild(deHeader);
+          deStoryDiv.appendChild(deBody);
+          deStoryDiv.appendChild(deActions);
+
+          deContainer.appendChild(deStoryDiv);
+        }
+      } else {
+        // Modo diferentes: EN y DE independientes
+        const enPool = englishTemplatesByLevel[level];
+        const dePool = germanTemplatesByLevel[level];
+
+        for (let i = 1; i <= totalStories; i++) {
+          const enText = getRandomItem(enPool)(i);
+          const deText = getRandomItem(dePool)(i);
+
+          // Inglés
+          const enStoryDiv = document.createElement("div");
+          enStoryDiv.className = "story";
+
+          const enHeader = document.createElement("div");
+          enHeader.className = "story-header";
+
+          const enTitle = document.createElement("div");
+          enTitle.className = "story-title";
+          enTitle.innerHTML = '<span class="story-index">#' + i + '</span> English story';
+
+          const enLevelTag = document.createElement("span");
+          enLevelTag.className = "level-tag";
+          enLevelTag.textContent = level;
+
+          enHeader.appendChild(enTitle);
+          enHeader.appendChild(enLevelTag);
+
+          const enBody = document.createElement("div");
+          enBody.className = "story-body";
+          enBody.textContent = enText;
+
+          const enActions = document.createElement("div");
+          enActions.className = "story-actions";
+
+          const enAudioBtn = document.createElement("button");
+          enAudioBtn.className = "audio-button";
+          enAudioBtn.textContent = "🔊 Listen";
+          enAudioBtn.addEventListener("click", () => speakText(enText, "en-US"));
+
+          enActions.appendChild(enAudioBtn);
+
+          enStoryDiv.appendChild(enHeader);
+          enStoryDiv.appendChild(enBody);
+          enStoryDiv.appendChild(enActions);
+
+          enContainer.appendChild(enStoryDiv);
+
+          // Alemán
+          const deStoryDiv = document.createElement("div");
+          deStoryDiv.className = "story";
+
+          const deHeader = document.createElement("div");
+          deHeader.className = "story-header";
+
+          const deTitle = document.createElement("div");
+          deTitle.className = "story-title";
+          deTitle.innerHTML = '<span class="story-index">#' + i + '</span> Deutsche Geschichte';
+
+          const deLevelTag = document.createElement("span");
+          deLevelTag.className = "level-tag";
+          deLevelTag.textContent = level === "A2" ? "A2" : "B1.1";
+
+          deHeader.appendChild(deTitle);
+          deHeader.appendChild(deLevelTag);
+
+          const deBody = document.createElement("div");
+          deBody.className = "story-body";
+          deBody.textContent = deText;
+
+          const deActions = document.createElement("div");
+          deActions.className = "story-actions";
+
+          const deAudioBtn = document.createElement("button");
+          deAudioBtn.className = "audio-button";
+          deAudioBtn.textContent = "🔊 Anhören";
+          deAudioBtn.addEventListener("click", () => speakText(deText, "de-DE"));
+
+          deActions.appendChild(deAudioBtn);
+
+          deStoryDiv.appendChild(deHeader);
+          deStoryDiv.appendChild(deBody);
+          deStoryDiv.appendChild(deActions);
+
+          deContainer.appendChild(deStoryDiv);
+        }
+      }
+
+      const timestamp = new Date().toLocaleTimeString();
+      const modeLabel = mode === "same" ? "Iguales (traducción)" : "Diferentes";
+      status.textContent = "Generado · " + totalStories + " EN + " + totalStories + " DE · " + modeLabel + " · " + level + " · " + timestamp;
+    }
+
+    // -----------------------------
+    // EVENTOS
+    // -----------------------------
+    document.getElementById("generateBtn").addEventListener("click", generateStories);
+    document.getElementById("modeSelect").addEventListener("change", generateStories);
+    document.getElementById("levelSelect").addEventListener("change", generateStories);
+
+    document.getElementById("pauseBtn").addEventListener("click", () => speechSynthesis.pause());
+    document.getElementById("resumeBtn").addEventListener("click", () => speechSynthesis.resume());
+    document.getElementById("stopBtn").addEventListener("click", () => speechSynthesis.cancel());
+
+    loadVoices();
+    generateStories();
+  </script>
+</body>
+</html>

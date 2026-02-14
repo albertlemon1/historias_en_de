@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historias EN/DE con Audio</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0b1120;
+      color: #e5e7eb;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-top: 0.25rem;
+    }
+
+    main {
+      padding: 1.5rem 2rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .column {
+      background: #020617;
+      border-radius: 0.75rem;
+      border: 1px solid #1f2937;
+      padding: 1rem 1.2rem 1.2rem;
+    }
+
+    .story {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #1f2937;
+    }
+
+    .story-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .story-body {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #d1d5db;
+      white-space: pre-wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem 2rem 1.5rem;
+      font-size: 0.8rem;
+      color: #6b7280;
+      border-top: 1px solid #111827;
+      background: #020617;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <h1>Generador de Historias EN/DE con Audio</h1>
+      <div class="subtitle">10 historias en inglés y 10 en alemán con lectura en voz alta</div>
+    </div>
+    <div class="pill">Versión con audio</div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="generateBtn">🔁 Regenerar historias</button>
+      <button onclick="speechSynthesis.pause()">⏸️ Pausar</button>
+      <button onclick="speechSynthesis.resume()">▶️ Reanudar</button>
+      <button onclick="speechSynthesis.cancel()">⏹️ Detener</button>
+      <span class="pill" id="statusPill">Listo · 10 EN + 10 DE</span>
+    </section>
+
+    <section class="grid">
+      <div class="column">
+        <h2>Historias en inglés</h2>
+        <div id="englishStories"></div>
+      </div>
+
+      <div class="column">
+        <h2>Geschichten auf Deutsch</h2>
+        <div id="germanStories"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    HTML + JavaScript · Lectura en voz alta · Práctica de idiomas
+  </footer>
+
+  <script>
+    // -----------------------------
+    // AUDIO
+    // -----------------------------
+    let availableVoices = [];
+
+    function loadVoices() {
+      availableVoices = speechSynthesis.getVoices();
+    }
+
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speakText(text, lang) {
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+
+      const voice = availableVoices.find(v => v.lang.startsWith(lang));
+      if (voice) utter.voice = voice;
+
+      speechSynthesis.speak(utter);
+    }
+
+    // -----------------------------
+    // PLANTILLAS DE HISTORIAS
+    // -----------------------------
+    const englishTemplates = [
+      (i) => `Every morning I walk through my neighborhood. In story ${i}, I bring a notebook to write three things I'm grateful for.`,
+      (i) => `On a rainy afternoon, story ${i} begins with a cup of tea and a forgotten letter found inside a book.`,
+      (i) => `In this ${i}th story, I visit a quiet lake and row to the center where everything feels peaceful.`,
+      (i) => `Story ${i} follows a curious reader who chooses a random country and learns ten facts about it.`,
+      (i) => `On Saturday evenings, story ${i} explores a new recipe shared with friends.`,
+      (i) => `In story ${i}, a stranger sits at my café table and an unexpected conversation begins.`,
+      (i) => `Story ${i} describes a winter walk through the snow, where footsteps sound like music.`,
+      (i) => `Every Friday I write a letter to my future self. Story ${i} focuses on a dream I want to protect.`,
+      (i) => `Story ${i} tells of a child climbing an old tree and seeing the world differently.`,
+      (i) => `During a long train ride, story ${i} imagines the lives of people in each town we pass.`
+    ];
+
+    const germanTemplates = [
+      (i) => `Jeden Morgen gehe ich durch meine Nachbarschaft. In Geschichte ${i} schreibe ich drei Dinge auf, für die ich dankbar bin.`,
+      (i) => `An einem regnerischen Nachmittag beginnt Geschichte ${i} mit einem alten Brief im Buch.`,
+      (i) => `In Geschichte ${i} rudere ich auf einen ruhigen See hinaus, weit weg vom Alltag.`,
+      (i) => `Geschichte ${i} erzählt von einer Leserin, die zehn Fakten über ein zufälliges Land lernt.`,
+      (i) => `An einem Samstagabend probieren wir in Geschichte ${i} ein neues Rezept aus.`,
+      (i) => `In Geschichte ${i} bittet ein Fremder darum, meinen Tisch im Café zu teilen.`,
+      (i) => `Geschichte ${i} beschreibt einen Spaziergang durch den Schnee in einer stillen Winternacht.`,
+      (i) => `Jeden Freitag schreibe ich einen Brief an mein zukünftiges Ich. Geschichte ${i} beschreibt einen Traum.`,
+      (i) => `Geschichte ${i} erzählt von einem Kind, das zum ersten Mal auf einen alten Baum klettert.`,
+      (i) => `Auf einer Zugreise stellt sich Geschichte ${i} das Leben der Menschen in jedem Dorf vor.`
+    ];
+
+    function getRandomTemplate(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // -----------------------------
+    // GENERAR HISTORIAS
+    // -----------------------------
+    function generateStories() {
+      const enContainer = document.getElementById("englishStories");
+      const deContainer = document.getElementById("germanStories");
+      const status = document.getElementById("statusPill");
+
+      enContainer.innerHTML = "";
+      deContainer.innerHTML = "";
+
+      for (let i = 1; i <= 10; i++) {
+        const enText = getRandomTemplate(englishTemplates)(i);
+        const deText = getRandomTemplate(germanTemplates)(i);
+
+        enContainer.innerHTML += `
+          <div class="story">
+            <div class="story-title">#${i} English Story</div>
+            <div class="story-body">${enText}</div>
+            <button onclick="speakText(\`${enText}\`, 'en-US')">🔊 Listen</button>
+          </div>
+        `;
+
+        deContainer.innerHTML += `
+          <div class="story">
+            <div class="story-title">#${i} Deutsche Geschichte</div>
+            <div class="story-body">${deText}</div>
+            <button onclick="speakText(\`${deText}\`, 'de-DE')">🔊 Anhören</button>
+          </div>
+        `;
+      }
+
+      status.textContent = "Historias generadas · " + new Date().toLocaleTimeString();
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generateStories);
+
+    loadVoices();
+    generateStories();
+  </script>
+</body>
+</html>
